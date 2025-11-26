@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', function() {
             
             const images = [
@@ -32,7 +31,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateGallery();
             }
             
-            // Создаем слайды
             function createSlides() {
                 gallerySlider.innerHTML = '';
                 images.forEach((imageUrl, index) => {
@@ -42,8 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     gallerySlider.appendChild(slide);
                 });
             }
-            
-            // Создаем точки пейджера
+
             function createPagerDots() {
                 pagerDots.innerHTML = '';
                 const totalPages = Math.ceil(images.length / slidesPerView);
@@ -73,41 +70,55 @@ document.addEventListener('DOMContentLoaded', function() {
             function goToSlide(slideIndex) {
                 const totalSlides = images.length;
                 const maxSlideIndex = totalSlides - slidesPerView;
+                const gap = 0;
                 
-                
-                if (slideIndex < 0) {
+                if (slideIndex <= 0) {
                     slideIndex = 0;
-                } else if (slideIndex > maxSlideIndex) {
+                    arrowLeft.style.display = 'none';    // Скрываем левую стрелку
+                } else {
+                    arrowLeft.style.display = 'block';   // Показываем левую стрелку
+                }
+                
+                if (slideIndex >= maxSlideIndex) {
                     slideIndex = maxSlideIndex;
+                    arrowRight.style.display = 'none';   // Скрываем правую стрелку
+                } else {
+                    arrowRight.style.display = 'block';  // Показываем правую стрелку
                 }
                 
                 currentSlide = slideIndex;
-                const translateX = -currentSlide * (100 / slidesPerView);
+                
+                const slideWidth = (100 - (gap * (slidesPerView - 1))) / slidesPerView;
+                const translateX = -currentSlide * (slideWidth + gap);
+    
                 gallerySlider.style.transform = `translateX(${translateX}%)`;
-                
-                
                 updatePager();
             }
             
             function updatePager() {
-                const currentPage = Math.floor(currentSlide / slidesPerView) + 1;
+                const totalPages = Math.ceil(images.length / slidesPerView);
+
+                let currentPage;
+                if (currentSlide >= images.length - slidesPerView) {
+                    currentPage = totalPages; 
+                } else {
+                    currentPage = Math.floor(currentSlide / slidesPerView) + 1;
+                }
+
                 currentPageSpan.textContent = currentPage;
-                
+                totalPagesSpan.textContent = totalPages;
+
                 document.querySelectorAll('.dot').forEach((dot, index) => {
-                    if (index === currentPage - 1) {
-                        dot.classList.add('active');
-                    } else {
-                        dot.classList.remove('active');
-                    }
+                    dot.classList.toggle('active', index === currentPage - 1);
                 });
             }
             
             
-            arrowLeft.addEventListener('click', () => {
+            arrowLeft.addEventListener('click', function(){
                 goToSlide(currentSlide - slidesPerView);
             });
             
-            arrowRight.addEventListener('click', () => {
+            arrowRight.addEventListener('click', function(){
                 goToSlide(currentSlide + slidesPerView);
             });
             
